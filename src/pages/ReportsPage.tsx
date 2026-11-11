@@ -1,0 +1,10 @@
+import { Download, FileText, Share2 } from 'lucide-react'
+import { useState } from 'react'
+import { DiaryGrid } from '../components/DiaryGrid'
+import { QuestionnaireGrid } from '../components/QuestionnaireGrid'
+import { exportMedicalDiary } from '../lib/pdf'
+import { durationMinutes, formatDuration } from '../lib/time'
+import { useAppStore } from '../store'
+
+export function ReportsPage(){const {profile,sessions,events,questionnaires}=useAppStore();const [page,setPage]=useState(1);if(!profile)return null;const complete=sessions.filter(s=>s.end&&s.kind==='night'),avg=complete.length?Math.round(complete.reduce((a,s)=>a+durationMinutes(s.start,s.end),0)/complete.length):0;const data={profile,sessions,events,questionnaires}
+return <div className="page wide-page reports-page"><header className="page-title"><div><span>CONSULTA MÉDICA</span><h1>Exportar Diário Médico</h1><p>Documento A4 horizontal, vetorial e preenchido com os seus registros.</p></div><FileText/></header><section className="metrics"><div><span>Noites registradas</span><b>{complete.length}</b></div><div><span>Média de repouso</span><b>{avg?formatDuration(avg):'Sem dados'}</b></div><div><span>Período</span><b>{profile.monitoringDays} dias</b></div></section><section className="preview-toolbar"><div><button className={page===1?'active':''} onClick={()=>setPage(1)}>Página 1 · Diário</button><button className={page===2?'active':''} onClick={()=>setPage(2)}>Página 2 · Questionário</button></div><span>Pré-visualização</span></section><div className="pdf-preview">{page===1?<DiaryGrid profile={profile} sessions={sessions} events={events} compact/>:<QuestionnaireGrid profile={profile} sessions={sessions} events={events} questionnaires={questionnaires} compact/>}</div><div className="export-actions"><button className="primary" onClick={()=>exportMedicalDiary(data)}><Download/>Gerar e salvar PDF</button><button onClick={()=>exportMedicalDiary(data,'share')}><Share2/>Compartilhar</button></div><p className="disclaimer">O iSleep organiza dados informados e medidos. Estimativas de relógios não substituem avaliação médica.</p></div>}
