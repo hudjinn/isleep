@@ -6,9 +6,7 @@ O iSleep é um diário pessoal de sono que funciona localmente. O aplicativo nã
 
 ## Dados tratados
 
-O aplicativo pode armazenar no próprio dispositivo dados de perfil, horários de sono, eventos cotidianos, respostas de questionários e, no Android, registros de sono autorizados pelo usuário no Health Connect.
-
-O acesso ao Health Connect é opcional, limitado à leitura de sono e pode ser revogado nas configurações do Android. O iSleep não acessa diretamente a Galaxy Fit3 por Bluetooth e não utiliza APIs privadas da Samsung.
+O aplicativo pode armazenar no próprio dispositivo dados de perfil, horários de sono registrados manualmente, eventos cotidianos e respostas de questionários.
 
 ## Armazenamento e compartilhamento
 
@@ -16,8 +14,8 @@ Os registros permanecem no dispositivo. Eles só deixam o aparelho quando o pró
 
 ## Exclusão
 
-Os dados podem ser removidos limpando o armazenamento do aplicativo ou desinstalando-o. Revogar a permissão do Health Connect impede novas leituras, mas não apaga automaticamente registros já importados; estes podem ser removidos no diário.
+Os dados podem ser removidos limpando o armazenamento do site no navegador ou desinstalando o PWA. Essas ações podem ser irreversíveis; exporte um backup antes, se necessário.
 
 ## Aviso de saúde
 
-O iSleep não fornece diagnóstico nem recomendação médica. Informações provenientes de relógios e aplicativos são estimativas e devem ser interpretadas por um profissional de saúde quando necessário.
+O iSleep não fornece diagnóstico nem recomendação médica. Os registros devem ser interpretados por um profissional de saúde quando necessário.

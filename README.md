@@ -1,6 +1,6 @@
 # iSleep — Diário Inteligente do Sono
 
-Aplicativo offline-first para acompanhar 14 dias de sono, registrar eventos em poucos toques e exportar as duas folhas do diário médico em PDF A4 horizontal.
+PWA offline-first para acompanhar o sono por um período configurável, registrar eventos em poucos toques e exportar as duas folhas do diário médico em PDF A4 horizontal.
 
 ## O que já está implementado
 
@@ -10,12 +10,12 @@ Aplicativo offline-first para acompanhar 14 dias de sono, registrar eventos em p
 - Diário visual de 12h às 11h do dia seguinte, com posicionamento proporcional por minuto.
 - PDF vetorial em duas páginas, pré-visualização, download e compartilhamento.
 - Perfil do paciente, backup JSON e interface responsiva em português brasileiro.
-- Plugin Kotlin do Health Connect para `SleepSessionRecord`, com permissão explícita, origem e deduplicação.
-- CI para testes/build web, APK Android debug e GitHub Pages.
+- Período de acompanhamento configurável ou sem limite.
+- CI para testes, build web e publicação no GitHub Pages.
 
 ## Desenvolvimento
 
-Requer Node.js 22.13+ e Java 21. O arquivo `.nvmrc` seleciona a versão correta quando o NVM está instalado.
+Requer Node.js 22.13+. O arquivo `.nvmrc` seleciona a versão correta quando o NVM está instalado.
 
 ```bash
 npm install
@@ -26,24 +26,14 @@ npm run build
 
 Node 18 e o npm 9.2 distribuído por algumas versões do Ubuntu não são compatíveis com a toolchain atual. Confirme com `node --version` antes da instalação.
 
-## Android e Galaxy Fit3
+## Instalação como aplicativo
 
-O fluxo suportado é **Galaxy Fit3 → Samsung Health → Health Connect → iSleep**. Não há acesso Bluetooth direto ou API privada da Samsung.
+Depois de publicar no GitHub Pages, abra o endereço no celular. No Chrome, use **Adicionar à tela inicial** ou **Instalar app**. O iSleep funciona offline após o primeiro carregamento.
 
-```bash
-npm install
-npm run build
-npx cap sync android
-cd android
-gradle assembleDebug
-```
-
-O APK fica em `android/app/build/outputs/apk/debug/app-debug.apk`. No GitHub, execute o workflow **Build iSleep** e baixe o artefato `isleep-apk-debug`.
-
-No celular, habilite o compartilhamento de sono no Samsung Health com o Health Connect. Depois, em **Ajustes → Galaxy Fit3**, conceda a permissão e sincronize. Sessões importadas entram como pendentes de revisão e nunca sobrescrevem registros manuais.
+Os horários de dormir, acordar, cochilos e demais eventos são registrados manualmente no próprio PWA.
 
 ## Privacidade e limitações
 
-Os dados ficam no dispositivo; não há conta, backend, anúncios ou analytics. A PWA não acessa o Health Connect — essa integração exige o APK Android. Dados da Galaxy Fit3 dependem do que o Samsung Health efetivamente disponibiliza ao Health Connect e não constituem diagnóstico clínico.
+Os dados ficam no dispositivo; não há conta, backend, anúncios ou analytics. Limpar os dados do navegador ou desinstalar o PWA pode apagar os registros, portanto exporte backups periodicamente.
 
-Para publicação na Play Store, declare os tipos de dados de saúde utilizados, forneça uma política de privacidade pública e configure assinatura de release por segredos do repositório. Nunca versione certificados ou dados médicos.
+O aplicativo é um diário pessoal e não constitui diagnóstico clínico. Nunca versione backups ou dados médicos no repositório.

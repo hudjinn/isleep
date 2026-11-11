@@ -1,4 +1,4 @@
-import { Activity, Beer, Coffee, Dumbbell, FileText, HeartPulse, Moon, Pill, Plus, Sun, Watch } from 'lucide-react'
+import { Activity, Beer, Coffee, Dumbbell, FileText, Moon, Pill, Plus, Sun } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { durationMinutes, formatDuration } from '../lib/time'
@@ -20,7 +20,6 @@ export function HomePage() {
     <h2>Registro rápido</h2>
     <section className="quick-grid"><button onClick={() => addEvent('caffeine')}><Coffee/>Cafeína</button><button onClick={() => addEvent('sleep-medication')}><Pill/>Remédio</button><button onClick={() => addEvent('exercise', { durationMinutes: 20 })}><Dumbbell/>Exercício</button><button onClick={() => addEvent('alcohol')}><Beer/>Álcool</button><button onClick={() => startSleep('nap')}><Moon/>Cochilo</button><button onClick={() => addEvent('note')}><Plus/>Observação</button></section>
     <Link to="/relatorios" className="export-cta"><FileText/><span><b>Exportar Diário Médico</b><small>PDF fiel ao formulário, em duas páginas</small></span><strong>›</strong></Link>
-    <section className="card connect-card"><div><HeartPulse/><b>Health Connect</b><span className="tag">Android</span></div><p>Galaxy Fit3 → Samsung Health → Health Connect → iSleep</p><Link to="/ajustes"><Watch/>Como configurar a sincronização</Link></section>
     <section className="privacy-note"><Activity/> Seus dados ficam somente neste dispositivo.</section>
   </div>
 }
