@@ -7,6 +7,7 @@ export const dateKey = (input: string | Date) => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 export const addDays = (date: string, days: number) => { const d = new Date(`${date}T12:00:00`); d.setDate(d.getDate() + days); return dateKey(d) }
+export const daysBetween = (start: string, end: string) => Math.floor((new Date(`${end}T12:00:00`).getTime() - new Date(`${start}T12:00:00`).getTime()) / DAY_MS)
 export const monitoringDateFor = (iso: string) => { const d = new Date(iso); if (d.getHours() < 12) d.setDate(d.getDate() - 1); return dateKey(d) }
 export const dateAtNoon = (date: string) => new Date(`${date}T12:00:00`)
 export const minutesFromDiaryStart = (iso: string, date: string) => (new Date(iso).getTime() - dateAtNoon(date).getTime()) / 60000

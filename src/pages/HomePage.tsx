@@ -7,12 +7,14 @@ import { useAppStore } from '../store'
 export function HomePage() {
   const { profile, sessions, startSleep, endSleep, addEvent } = useAppStore()
   const [now, setNow] = useState(() => new Date()); const active = [...sessions].reverse().find(s => !s.end)
-  const day = profile ? Math.min(profile.monitoringDays, Math.max(1, Math.floor((now.getTime() - new Date(`${profile.monitoringStart}T12:00:00`).getTime()) / 86400000) + 1)) : 1
-  const progress = profile ? Math.round(day / profile.monitoringDays * 100) : 0
+  const elapsedDay = profile ? Math.max(1, Math.floor((now.getTime() - new Date(`${profile.monitoringStart}T12:00:00`).getTime()) / 86400000) + 1) : 1
+  const unlimited = profile?.monitoringDays === 0
+  const day = profile && !unlimited ? Math.min(profile.monitoringDays, elapsedDay) : elapsedDay
+  const progress = profile && !unlimited ? Math.round(day / profile.monitoringDays * 100) : 0
   useEffect(() => { const timer = window.setInterval(() => setNow(new Date()), 60000); return () => clearInterval(timer) }, [])
   return <div className="page home-page">
     <header className="home-header"><div><p>{new Intl.DateTimeFormat('pt-BR',{weekday:'long',day:'2-digit',month:'short'}).format(now).toUpperCase()}</p><h1>Meu sono</h1></div><div className="moon-badge"><Moon/></div></header>
-    <section className="card progress-card"><div><span>Diário de acompanhamento</span><Link to="/diario">Ver diário</Link></div><div><b>Dia {day} de {profile?.monitoringDays || 14}</b><strong>{progress}%</strong></div><div className="progress"><i style={{width:`${progress}%`}}/></div></section>
+    <section className="card progress-card"><div><span>Diário de acompanhamento</span><Link to="/diario">Ver diário</Link></div><div><b>Dia {day}{unlimited?' · sem limite':` de ${profile?.monitoringDays || 14}`}</b>{!unlimited&&<strong>{progress}%</strong>}</div>{!unlimited&&<div className="progress"><i style={{width:`${progress}%`}}/></div>}</section>
     {active && <div className="active-sleep"><Moon/><span>Repouso em andamento</span><b>{formatDuration(durationMinutes(active.start, new Date().toISOString()))}</b></div>}
     <section className="primary-actions"><button onClick={() => startSleep('night')} disabled={!!active}><Moon/><b>Vou dormir</b><small>Registrar agora</small></button><button onClick={endSleep} disabled={!active}><Sun/><b>Acordei</b><small>Registrar agora</small></button></section>
     <h2>Registro rápido</h2>

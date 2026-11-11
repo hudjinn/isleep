@@ -5,8 +5,8 @@ import { addDays, clamp, formatShortDate, minutesFromDiaryStart, monitoringDateF
 const hours = [...Array(24)].map((_, i) => (i + 12) % 24)
 const marker: Record<DailyEvent['type'], string> = { caffeine: 'C', alcohol: 'A', 'sleep-medication': 'S', medication: 'M', exercise: 'E', note: '•' }
 
-export function DiaryGrid({ profile, sessions, events, compact = false }: { profile: PatientProfile; sessions: SleepSession[]; events: DailyEvent[]; compact?: boolean }) {
-  const dates = [...Array(profile.monitoringDays)].map((_, i) => addDays(profile.monitoringStart, i))
+export function DiaryGrid({ profile, sessions, events, compact = false, startDate = profile.monitoringStart, dayCount = Math.min(profile.monitoringDays || 14, 14) }: { profile: PatientProfile; sessions: SleepSession[]; events: DailyEvent[]; compact?: boolean; startDate?: string; dayCount?: number }) {
+  const dates = [...Array(dayCount)].map((_, i) => addDays(startDate, i))
   return <div className={`paper diary-paper ${compact ? 'compact' : ''}`}>
     <section className="paper-heading">
       <div className="diary-logo">Diário do <strong>sono</strong></div>

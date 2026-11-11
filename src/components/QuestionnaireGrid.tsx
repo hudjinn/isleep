@@ -9,8 +9,8 @@ const questions = [
   'Como você se sentiu durante o dia?\n1 Bem; 2 Cansado; 3 Sonolento; 4 Deprimido', 'Ficou irritado durante o dia?', 'Ficou estressado durante o dia?'
 ]
 
-export function QuestionnaireGrid({ profile, sessions, events, questionnaires, compact = false }: { profile: PatientProfile; sessions: SleepSession[]; events: DailyEvent[]; questionnaires: DailyQuestionnaire[]; compact?: boolean }) {
-  const dates = [...Array(profile.monitoringDays)].map((_, i) => addDays(profile.monitoringStart, i))
+export function QuestionnaireGrid({ profile, sessions, events, questionnaires, compact = false, startDate = profile.monitoringStart, dayCount = Math.min(profile.monitoringDays || 14, 14) }: { profile: PatientProfile; sessions: SleepSession[]; events: DailyEvent[]; questionnaires: DailyQuestionnaire[]; compact?: boolean; startDate?: string; dayCount?: number }) {
+  const dates = [...Array(dayCount)].map((_, i) => addDays(startDate, i))
   return <div className={`paper questionnaire-paper ${compact ? 'compact' : ''}`}>
     <h2>PREENCHA O QUESTIONÁRIO ABAIXO À NOITE ANTES DE SE DEITAR PARA DORMIR</h2>
     <div className="question-table"><div className="q-empty"/><div className="q-title">Data e dia da semana</div><div className="q-empty"/>{dates.map(d => <div className="q-date" key={d}>{formatShortDate(d)}<small>{weekday(d)}</small></div>)}
