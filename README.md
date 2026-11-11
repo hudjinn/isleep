@@ -15,7 +15,7 @@ Aplicativo offline-first para acompanhar 14 dias de sono, registrar eventos em p
 
 ## Desenvolvimento
 
-Requer Node.js 22.13+ e Java 17. O arquivo `.nvmrc` seleciona a versão correta quando o NVM está instalado.
+Requer Node.js 22.13+ e Java 21. O arquivo `.nvmrc` seleciona a versão correta quando o NVM está instalado.
 
 ```bash
 npm install
