@@ -9,7 +9,7 @@ const defaultProfile = (): PatientProfile => ({ ...stamp(), fullName: '', monito
 interface AppState {
   ready: boolean; profile?: PatientProfile; sessions: SleepSession[]; events: DailyEvent[]; questionnaires: DailyQuestionnaire[]; toast?: string; lastDeleted?: DailyEvent;
   load: () => Promise<void>; saveProfile: (profile: PatientProfile) => Promise<void>; startSleep: (kind?: 'night' | 'nap') => Promise<void>; endSleep: () => Promise<void>;
-  updateSession: (id: string, patch: Partial<SleepSession>) => Promise<void>; deleteSession: (id: string) => Promise<void>; addEvent: (type: DailyEvent['type'], data?: Partial<DailyEvent>) => Promise<void>; undoEvent: () => Promise<void>; saveQuestionnaire: (date: string, patch: Partial<DailyQuestionnaire>) => Promise<void>; clearToast: () => void;
+  addManualSession: (start: string, end: string, kind?: 'night' | 'nap') => Promise<void>; updateSession: (id: string, patch: Partial<SleepSession>) => Promise<void>; deleteSession: (id: string) => Promise<void>; addEvent: (type: DailyEvent['type'], data?: Partial<DailyEvent>) => Promise<void>; undoEvent: () => Promise<void>; saveQuestionnaire: (date: string, patch: Partial<DailyQuestionnaire>) => Promise<void>; clearToast: () => void;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -30,6 +30,11 @@ export const useAppStore = create<AppState>((set, get) => ({
     if (!active) { set({ toast: 'Nenhum repouso em andamento' }); return }
     const updated = { ...active, end: isoNow(), gotOutOfBed: true, updatedAt: isoNow() }
     await db.sessions.put(updated); set(s => ({ sessions: s.sessions.map(x => x.id === active.id ? updated : x), toast: active.kind === 'nap' ? 'Cochilo encerrado' : 'Despertar registrado' }))
+  },
+  addManualSession: async (start, end, kind = 'night') => {
+    const session: SleepSession = { ...stamp(), start, end, kind, gotOutOfBed: true, reviewed: true }
+    await db.sessions.add(session)
+    set(s => ({ sessions: [...s.sessions, session], toast: kind === 'nap' ? 'Cochilo manual adicionado' : 'Período de sono adicionado' }))
   },
   updateSession: async (id, patch) => { const current=get().sessions.find(s=>s.id===id);if(!current)return;const updated={...current,...patch,updatedAt:isoNow(),origin:'manual' as const,reviewed:true};await db.sessions.put(updated);set(s=>({sessions:s.sessions.map(x=>x.id===id?updated:x),toast:'Horários corrigidos'})) },
   deleteSession: async id => { await db.transaction('rw',db.sessions,db.stages,async()=>{await db.sessions.delete(id);await db.stages.where('sessionId').equals(id).delete()});set(s=>({sessions:s.sessions.filter(x=>x.id!==id),toast:'Período removido'})) },

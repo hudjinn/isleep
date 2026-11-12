@@ -1,4 +1,4 @@
-import { Activity, Beer, Coffee, Dumbbell, FileText, Moon, Pill, Plus, Sun } from 'lucide-react'
+import { Activity, Beer, Clock3, Coffee, Dumbbell, FileText, Moon, Pill, Plus, Sun } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { durationMinutes, formatDuration } from '../lib/time'
@@ -17,6 +17,7 @@ export function HomePage() {
     <section className="card progress-card"><div><span>Diário de acompanhamento</span><Link to="/diario">Ver diário</Link></div><div><b>Dia {day}{unlimited?' · sem limite':` de ${profile?.monitoringDays || 14}`}</b>{!unlimited&&<strong>{progress}%</strong>}</div>{!unlimited&&<div className="progress"><i style={{width:`${progress}%`}}/></div>}</section>
     {active && <div className="active-sleep"><Moon/><span>Repouso em andamento</span><b>{formatDuration(durationMinutes(active.start, new Date().toISOString()))}</b></div>}
     <section className="primary-actions"><button onClick={() => startSleep('night')} disabled={!!active}><Moon/><b>Vou dormir</b><small>Registrar agora</small></button><button onClick={endSleep} disabled={!active}><Sun/><b>Acordei</b><small>Registrar agora</small></button></section>
+    <Link to="/diario" className="manual-entry-link"><Clock3/>Inserir horários do relógio manualmente</Link>
     <h2>Registro rápido</h2>
     <section className="quick-grid"><button onClick={() => addEvent('caffeine')}><Coffee/>Cafeína</button><button onClick={() => addEvent('sleep-medication')}><Pill/>Remédio</button><button onClick={() => addEvent('exercise', { durationMinutes: 20 })}><Dumbbell/>Exercício</button><button onClick={() => addEvent('alcohol')}><Beer/>Álcool</button><button onClick={() => startSleep('nap')}><Moon/>Cochilo</button><button onClick={() => addEvent('note')}><Plus/>Observação</button></section>
     <Link to="/relatorios" className="export-cta"><FileText/><span><b>Exportar Diário Médico</b><small>PDF fiel ao formulário, em duas páginas</small></span><strong>›</strong></Link>

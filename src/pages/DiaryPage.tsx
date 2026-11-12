@@ -1,14 +1,30 @@
 import { useState } from 'react'
 import { DiaryGrid } from '../components/DiaryGrid'
 import { QuestionnaireGrid } from '../components/QuestionnaireGrid'
-import { addDays, dateKey, daysBetween, monitoringDateFor, toLocalDateTimeInput } from '../lib/time'
+import { addDays, dateKey, DAY_MS, daysBetween, monitoringDateFor, toLocalDateTimeInput } from '../lib/time'
 import { useAppStore } from '../store'
 
 export function DiaryPage(){
-  const {profile,sessions,events,questionnaires,saveQuestionnaire,updateSession,deleteSession}=useAppStore()
+  const {profile,sessions,events,questionnaires,saveQuestionnaire,addManualSession,updateSession,deleteSession}=useAppStore()
   const [tab,setTab]=useState<'timeline'|'questions'>('timeline')
-  const [selected,setSelected]=useState(profile?.monitoringStart||dateKey(new Date()))
+  const initialDate=profile?.monitoringStart||dateKey(new Date())
+  const [selected,setSelected]=useState(initialDate)
+  const [manualStart,setManualStart]=useState(`${initialDate}T22:00`)
+  const [manualEnd,setManualEnd]=useState(`${addDays(initialDate,1)}T07:00`)
+  const [manualKind,setManualKind]=useState<'night'|'nap'>('night')
+  const [manualError,setManualError]=useState('')
   if(!profile)return null
+  const selectDate=(date:string)=>{setSelected(date);setManualStart(`${date}T22:00`);setManualEnd(`${addDays(date,1)}T07:00`);setManualError('')}
+  const saveManualSession=async()=>{
+    if(!manualStart||!manualEnd){setManualError('Informe os horários de dormir e acordar.');return}
+    const start=new Date(manualStart)
+    const end=new Date(manualEnd)
+    if(Number.isNaN(start.getTime())||Number.isNaN(end.getTime())){setManualError('Informe horários válidos.');return}
+    if(end<=start){setManualError('O horário de acordar precisa ser posterior ao horário de dormir.');return}
+    if(end.getTime()-start.getTime()>DAY_MS){setManualError('O período não pode ultrapassar 24 horas.');return}
+    await addManualSession(start.toISOString(),end.toISOString(),manualKind)
+    setManualError('')
+  }
   const q=questionnaires.find(x=>x.date===selected)
   const selectedSessions=sessions.filter(s=>monitoringDateFor(s.start)===selected)
   const unlimited=profile.monitoringDays===0
@@ -17,10 +33,11 @@ export function DiaryPage(){
   const sheetStart=addDays(profile.monitoringStart,sheetOffset)
   const sheetDays=unlimited?14:Math.min(14,Math.max(1,profile.monitoringDays-sheetOffset))
   return <div className="page wide-page">
-    <header className="page-title"><div><span>{unlimited?'ACOMPANHAMENTO SEM LIMITE':`ACOMPANHAMENTO DE ${profile.monitoringDays} DIAS`}</span><h1>Diário do sono</h1></div><input type="date" min={profile.monitoringStart} max={unlimited?undefined:addDays(profile.monitoringStart,profile.monitoringDays-1)} value={selected} onChange={e=>setSelected(e.target.value)}/></header>
+    <header className="page-title"><div><span>{unlimited?'ACOMPANHAMENTO SEM LIMITE':`ACOMPANHAMENTO DE ${profile.monitoringDays} DIAS`}</span><h1>Diário do sono</h1></div><input type="date" min={profile.monitoringStart} max={unlimited?undefined:addDays(profile.monitoringStart,profile.monitoringDays-1)} value={selected} onChange={e=>selectDate(e.target.value)}/></header>
     <div className="tabs"><button className={tab==='timeline'?'active':''} onClick={()=>setTab('timeline')}>Linha do tempo</button><button className={tab==='questions'?'active':''} onClick={()=>setTab('questions')}>Questionário diário</button></div>
     {tab==='timeline'?<>
-      <section className="session-editor card"><div><h2>Períodos deste dia</h2><span>Corrija horários ou revise dados importados</span></div>
+      <section className="manual-session card" id="registro-manual"><div><h2>Adicionar horários manualmente</h2><span>Consulte o relógio e informe o período de sono.</span></div><div className="manual-session-fields"><label>Dormi em<input type="datetime-local" value={manualStart} onChange={e=>setManualStart(e.target.value)}/></label><label>Acordei em<input type="datetime-local" value={manualEnd} onChange={e=>setManualEnd(e.target.value)}/></label><label>Tipo<select value={manualKind} onChange={e=>setManualKind(e.target.value as 'night'|'nap')}><option value="night">Sono noturno</option><option value="nap">Cochilo</option></select></label><button className="primary" onClick={saveManualSession}>Adicionar período</button></div>{manualError&&<p className="manual-error" role="alert">{manualError}</p>}<small>Para o sono noturno, a data de acordar normalmente será o dia seguinte.</small></section>
+      <section className="session-editor card"><div><h2>Períodos deste dia</h2><span>Você pode corrigir ou remover os horários registrados.</span></div>
         {selectedSessions.map(s=><div className="session-row" key={s.id}><span className="source manual">Manual</span><label>Início<input type="datetime-local" value={toLocalDateTimeInput(s.start)} onChange={e=>updateSession(s.id,{start:new Date(e.target.value).toISOString()})}/></label><label>Fim<input type="datetime-local" value={toLocalDateTimeInput(s.end)} onChange={e=>updateSession(s.id,{end:e.target.value?new Date(e.target.value).toISOString():undefined})}/></label><button onClick={()=>deleteSession(s.id)}>Remover</button></div>)}
         {!selectedSessions.length&&<p>Nenhum período registrado neste dia.</p>}
       </section>
